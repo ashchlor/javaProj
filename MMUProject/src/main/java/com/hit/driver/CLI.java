@@ -1,19 +1,37 @@
 package com.hit.driver;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Observable;
 import java.util.logging.Level;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonIOException;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.stream.JsonReader;
+import com.hit.algorithm.IAlgoCache;
+import com.hit.algorithm.LFUAlgoCacheImpl;
+import com.hit.algorithm.LRUAlgoCacheImpl;
+import com.hit.algorithm.SecondChanceAlgoCacheImpl;
+import com.hit.memoryunits.MemoryManagementUnit;
+import com.hit.processes.Process;
+import com.hit.processes.ProcessCycles;
+import com.hit.processes.RunConfiguration;
 import com.hit.util.MMULogger;
 
-public class CLI implements Runnable {
+public class CLI  extends Observable implements Runnable {
 
 	MMULogger _logger;
 	InputStream _in;
 	OutputStream _out;
+	
 	
 	public CLI(InputStream in, OutputStream out){
 		_in = in;
@@ -56,7 +74,11 @@ public class CLI implements Runnable {
 					String[] spl = inputText.split(" ");
 					if(spl.length == 2)
 					{
-						MMUDriver.Start(spl);
+						ArrayList<String> configuration = new ArrayList<>();
+						configuration.add(spl[0]);
+						configuration.add(spl[1]);					
+						setChanged();
+						notifyObservers(configuration);
 					}
 					else
 					{
@@ -74,4 +96,6 @@ public class CLI implements Runnable {
 		}
 		
 	}
+	
+	
 }

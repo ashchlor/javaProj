@@ -10,13 +10,17 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import com.hit.memoryunits.Page;
+
 public class MMUView extends Observable implements View {
 
-	int ramSize = 6; //TODO Omer
+	public int ramSize = 6;
+	JScrollPane pane = new JScrollPane();
 	JFrame frame = new JFrame("MMU View");
 	JTable table = new JTable();
 	JLabel pg = new JLabel("Page Fault Amount");
@@ -27,6 +31,7 @@ public class MMUView extends Observable implements View {
 	JList<String> lstProcesses = new JList<>();
 	JButton btnPlay = new JButton("Play");
 	JButton btnPlayAll = new JButton("Play All");
+	
 	public MMUView() {
 		// TODO Auto-generated constructor stub
 	}
@@ -80,8 +85,7 @@ public class MMUView extends Observable implements View {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				setChanged();
-				notifyObservers("PA"); //Play all
-				
+				notifyObservers("PA:0"); //Play all		
 			}
 		});
 		
@@ -110,6 +114,21 @@ public class MMUView extends Observable implements View {
 		frame.setResizable(false);
 		frame.setVisible(true);
 		frame.setVisible(true);
+	}
+	
+	public void setRamData(Page<byte[]>[] pages)
+	{
+		for(int i = 0; i < ramSize; i++)
+		{		
+			if(i < pages.length)
+			{
+				table.setValueAt(pages[i].getId(), 0, i);
+				byte[] data = pages[i].getContent();
+				for(int j = 0; j < data.length; j++)
+					table.setValueAt(data[j], j+1 , j);
+			}
+			
+		}
 	}
 	
 	public void SetProcesses(List<String> processes)

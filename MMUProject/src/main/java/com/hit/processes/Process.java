@@ -1,13 +1,14 @@
 package com.hit.processes;
 
 import java.util.List;
+import java.util.Observable;
 import java.util.logging.Level;
 
 import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.memoryunits.Page;
 import com.hit.util.MMULogger;
 
-public class Process implements Runnable {
+public class Process extends Observable implements Runnable {
 
 	int _id;
 	MemoryManagementUnit _mmu;
@@ -20,8 +21,10 @@ public class Process implements Runnable {
 		_processCycles = processCycles;
 	}
 	
+	@SuppressWarnings("rawtypes")
 	@Override
 	public void run() {
+		int a = 0;
 		for(ProcessCycle cycle : _processCycles.getProcessCycles())
 		{
 			List<Long> pages = cycle.getPages();
@@ -30,6 +33,8 @@ public class Process implements Runnable {
 			{
 				synchronized (_mmu.getClass()) {
 					Page[] mmuPages = _mmu.getPages(pageArr);
+					setChanged();
+					notifyObservers(mmuPages);
 					int i = 0;
 					for(Page<byte[]> mmuPage : mmuPages)
 					{
@@ -39,7 +44,7 @@ public class Process implements Runnable {
 			}
 			catch (Exception e)
 			{
-				MMULogger.getInstance().write(e.getMessage(), Level.SEVERE);
+				MMULogger.getInstance().write(e.toString(), Level.SEVERE);
 			}
 			try {
 				Thread.sleep(cycle.getSleepMs());

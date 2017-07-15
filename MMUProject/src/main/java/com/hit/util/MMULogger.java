@@ -31,7 +31,7 @@ public class MMULogger {
 	}
 	
 	public synchronized void write(String command, Level level){
-		LogRecord log = new LogRecord(level, command);
+		LogRecord log = new LogRecord(level, command + "\n");
 		handler.publish(log);
 	}
 	
