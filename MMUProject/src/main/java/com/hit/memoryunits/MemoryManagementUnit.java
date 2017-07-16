@@ -56,6 +56,9 @@ public class MemoryManagementUnit extends Observable {
 			}
 			pages.add(pg);
 		}
+		
+		setChanged();
+		notifyObservers(_ram.getPages());
 				
 		Page<byte[]> pagesArr[] = new Page[pages.size()];
 		for(int i = 0; i < pages.size(); i++)

@@ -4,6 +4,7 @@ import java.awt.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 public class RAM {
 
@@ -42,9 +43,15 @@ public class RAM {
 		}
 	}
 	
-	public Map<Long,Page> getPages() 
+	public Page<byte[]>[] getPages() 
 	{
-		return _pagesMap;
+		Page<byte[]>[] pages = new Page[_pagesMap.size()];
+		int i = 0;
+		for(Entry<Long,Page> entry : _pagesMap.entrySet())
+		{
+			pages[i++] = entry.getValue();
+		}
+		return pages;
 	}
 	
 	@SuppressWarnings("unchecked")

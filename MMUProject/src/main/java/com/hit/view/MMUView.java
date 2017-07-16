@@ -14,6 +14,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 
 import com.hit.memoryunits.Page;
 
@@ -58,16 +60,19 @@ public class MMUView extends Observable implements View {
 		table.setEnabled(false);
 		table.setRowHeight(20);
 		table.setBounds(10, 20, 600, 240);
-
+		String[] colHeaders = new String[ramSize];
+		
 		for (int i = 0; i < ramSize; i++) {
 			row[i] = 0;
+			colHeaders[i] = Integer.toString(i);
 			tab_model.addColumn(i);
 		}
 		for (int j = 0; j < 6; j++) {
 			tab_model.insertRow(j, row);
 		}
+		tab_model.setColumnIdentifiers(colHeaders); 
 		table.setModel(tab_model);
-
+		
 		
 		txtPf.setBounds(800, 100, 50, 20);
 		pg.setBounds(620, 100, 200, 20);
@@ -109,7 +114,9 @@ public class MMUView extends Observable implements View {
 		frame.add(pr);
 		frame.add(txtPf);		
 		frame.add(pg);
-		frame.add(table);
+		JScrollPane sclPane = new JScrollPane(table);
+		sclPane.setBounds(10, 20, 600, 240);
+		frame.add(sclPane);
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setVisible(true);
@@ -118,17 +125,26 @@ public class MMUView extends Observable implements View {
 	
 	public void setRamData(Page<byte[]>[] pages)
 	{
+		JTableHeader header = table.getTableHeader();
+		TableColumnModel tcm = header.getColumnModel();
 		for(int i = 0; i < ramSize; i++)
 		{		
 			if(i < pages.length)
 			{
-				table.setValueAt(pages[i].getId(), 0, i);
+				tcm.getColumn(i).setHeaderValue(pages[i].getId());
+				
 				byte[] data = pages[i].getContent();
 				for(int j = 0; j < data.length; j++)
-					table.setValueAt(data[j], j+1 , j);
+					table.setValueAt(data[j], j , i);
 			}
-			
+			else
+			{
+				tcm.getColumn(i).setHeaderValue(0);
+				for(int j = 0; j < 6; j++)
+					table.setValueAt(0, j , i);
+			}
 		}
+		header.repaint();
 	}
 	
 	public void SetProcesses(List<String> processes)

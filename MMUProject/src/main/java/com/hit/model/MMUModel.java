@@ -102,7 +102,6 @@ public class MMUModel extends Observable implements Model, Observer{
 		ExecutorService exec = Executors.newCachedThreadPool(); 
 		for(Process prc : _processes)
 		{
-			prc.addObserver(this);
 			if(prcId.contains(Integer.toString(prc.getId())))
 				exec.execute(prc);
 		}
@@ -115,11 +114,11 @@ public class MMUModel extends Observable implements Model, Observer{
 		ExecutorService exec = Executors.newCachedThreadPool(); 
 		for(Process prc : _processes)
 		{
-			prc.addObserver(this);
 			exec.execute(prc);
 		}
 		
 		exec.shutdown();
+		
 	}
 		
 	@Override
@@ -130,22 +129,19 @@ public class MMUModel extends Observable implements Model, Observer{
 
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		if(arg0 instanceof Process)
+		if(arg0 instanceof MemoryManagementUnit)
 		{
 			if(arg1 instanceof Page[])
 			{
 				setChanged();
 				notifyObservers(arg1);
 			}
-		}
-		else if(arg0 instanceof MemoryManagementUnit){
-			if(arg1 instanceof String)
+			else if(arg1 instanceof String)
 			{
 				setChanged();
 				notifyObservers(arg1);
 			}
 		}
-		
 	}
 
 }

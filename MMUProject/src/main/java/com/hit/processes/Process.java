@@ -8,7 +8,7 @@ import com.hit.memoryunits.MemoryManagementUnit;
 import com.hit.memoryunits.Page;
 import com.hit.util.MMULogger;
 
-public class Process extends Observable implements Runnable {
+public class Process implements Runnable {
 
 	int _id;
 	MemoryManagementUnit _mmu;
@@ -33,8 +33,7 @@ public class Process extends Observable implements Runnable {
 			{
 				synchronized (_mmu.getClass()) {
 					Page[] mmuPages = _mmu.getPages(pageArr);
-					setChanged();
-					notifyObservers(mmuPages);
+					
 					int i = 0;
 					for(Page<byte[]> mmuPage : mmuPages)
 					{
