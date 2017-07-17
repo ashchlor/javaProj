@@ -72,11 +72,12 @@ public class CLI  extends Observable implements Runnable {
 					write("please enter required algorithm and RAM capacity\n");
 					inputText = now.readLine();
 					String[] spl = inputText.split(" ");
-					if(spl.length == 2)
+					if(spl.length == 3)
 					{
 						ArrayList<String> configuration = new ArrayList<>();
 						configuration.add(spl[0]);
-						configuration.add(spl[1]);					
+						configuration.add(spl[1]);
+						configuration.add(spl[2]);
 						setChanged();
 						notifyObservers(configuration);
 					}

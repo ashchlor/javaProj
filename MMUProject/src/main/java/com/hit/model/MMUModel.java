@@ -30,17 +30,23 @@ public class MMUModel extends Observable implements Model, Observer{
 	public int numProcesses;
 	public int ramCapacity;
 	private List<Process> _processes;
-	private static final String CONFIG_FILE_NAME = "src/main/resources/Configuration/Configuration.json";
+	private String CONFIG_FILE_NAME = "src/main/resources/Configuration/Configuration.json";
+	public List<String> configuration;
 	
 	public MMUModel() {
 		_logger = MMULogger.getInstance();
 	}
 	
-	public void setConfiguration(List<String> commands) throws JsonIOException, JsonSyntaxException, FileNotFoundException
+	public void SetConfigurationFile(String configFile)
+	{
+		CONFIG_FILE_NAME = configFile; 
+	}
+	
+	public void setConfiguration() throws JsonIOException, JsonSyntaxException, FileNotFoundException
 	{
 		IAlgoCache<Long, Long> algo = null;
-		int capacity = Integer.parseInt(commands.get(1));
-		switch(commands.get(0))
+		int capacity = Integer.parseInt(configuration.get(1));
+		switch(configuration.get(0).toUpperCase())
 		{
 			case "LRU":
 			{
@@ -60,6 +66,7 @@ public class MMUModel extends Observable implements Model, Observer{
 			default:
 				return;
 		}
+		
 		_logger.write("RC:" + capacity, Level.INFO);
 		MemoryManagementUnit mmu = new MemoryManagementUnit(capacity, algo);
 		mmu.addObserver(this);
@@ -77,6 +84,7 @@ public class MMUModel extends Observable implements Model, Observer{
 		
 		setChanged();
 		notifyObservers(prcIds);
+
 	}
 	
 	private List<Process> createProcesses(List<ProcessCycles> cycles, MemoryManagementUnit mmu)

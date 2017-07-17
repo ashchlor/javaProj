@@ -120,7 +120,6 @@ public class MMUView extends Observable implements View {
 		frame.setLocationRelativeTo(null);
 		frame.setResizable(false);
 		frame.setVisible(true);
-		frame.setVisible(true);
 	}
 	
 	public void setRamData(Page<byte[]>[] pages)

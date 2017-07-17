@@ -11,9 +11,11 @@ import com.google.gson.JsonIOException;
 import com.google.gson.JsonSyntaxException;
 import com.hit.driver.CLI;
 import com.hit.memoryunits.Page;
+import com.hit.model.MMUClient;
 import com.hit.model.MMUModel;
 import com.hit.model.Model;
 import com.hit.util.MMULogger;
+import com.hit.view.LoginView;
 import com.hit.view.MMUView;
 import com.hit.view.View;
 
@@ -21,26 +23,37 @@ public class MMUController implements Observer  {
 
 	MMUModel _model;
 	MMUView _view;
-	public MMUController(MMUModel model, MMUView view) {
+	LoginView _loginView;
+	MMUClient _client;
+	
+	public MMUController(MMUModel model, MMUView view, LoginView login) {
 		_model = model;
 		_view = view;
+		_loginView = login;
+		_client = MMUClient.getInstance();
+		_client.addObserver(this);
 	}
 	
 	
 	@Override
 	public void update(Observable arg0, Object arg1) {
-		String[] commands = null;
-		
-		if(arg1 instanceof String)
-		{
 		String command = arg1.toString();
-		commands = command.split(":");
-		if(commands.length != 2)
-			{
-			MMULogger.getInstance().write("Invalid command to controller", Level.SEVERE);
-			return;
+		String[] commands = command.split(":");
+		
+		if(arg0 instanceof LoginView) //Login To Client
+		{
+			if(commands.length != 3) return;
+			
+			MMUClient.getInstance().SendLoginDetails(commands[0], commands[1], commands[2]);
+			try {
+				_model.setConfiguration();
+			} catch (JsonIOException | JsonSyntaxException | FileNotFoundException e) {
+				MMULogger.getInstance().write(e.toString(), Level.SEVERE);
 			}
+			_loginView.HideLoginView();
+			_view.start();
 		}
+		
 		
 		if(arg0 instanceof MMUModel) //Model to View
 		{		
@@ -89,26 +102,31 @@ public class MMUController implements Observer  {
 				}
 			}
 		}
+		else if(arg0 instanceof MMUClient)
+		{
+			String str = arg1.toString();
+			_model.SetConfigurationFile(str);
+		}
 		else if(arg0 instanceof CLI) //CLI to model
 		{
 			if(arg1 instanceof ArrayList) // List of processes
 			{
 				@SuppressWarnings("unchecked")
 				List<String> lst = (ArrayList<String>)arg1;
-				try {
-					_model.setConfiguration(lst);
-					_view.start();
-				} catch (Exception e) {
-					MMULogger.getInstance().write(e.toString(), Level.SEVERE);
-				}
-			}
-			else
-			{
-				switch(commands[0])
+				_model.configuration = lst;
+				if(lst.get(2).toUpperCase().equals("REMOTE"))
 				{
-				case "StartView":
+					_client.InitClient();
+					_loginView.start();
+				}
+				else
+				{
+					try {
+						_model.setConfiguration();
+					} catch (Exception e) {
+						MMULogger.getInstance().write(e.toString(), Level.SEVERE);
+					}
 					_view.start();
-					break;
 				}
 			}
 		}
